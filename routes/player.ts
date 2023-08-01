@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express'
-import { getPlayer, getPlayerUnlocks } from '../controllers/playerController'
+import { createPlayer, getPlayer, getPlayerUnlocks } from '../controllers/playerController'
 
 const router = express.Router()
 
@@ -10,5 +10,7 @@ router.get('/', (req: Request, res: Response) => {
 router.get('/:id', getPlayer)
 
 router.get('/:id/unlocks', getPlayerUnlocks)
+
+router.post('/', createPlayer)
 
 export default router
