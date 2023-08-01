@@ -100,7 +100,7 @@ function fetchPlayerUnlocks(data: any[]) {
 }
 
 const getPlayer = asyncHandler(async (req: Request, res: Response) => {
-  let { id } = req.params
+  let id = req.params.id
 
   try {
     const cacheResults = await redisClient.get(id)
@@ -124,7 +124,7 @@ const getPlayer = asyncHandler(async (req: Request, res: Response) => {
 })
 
 const getPlayerUnlocks = asyncHandler(async (req: Request, res: Response) => {
-  let { id } = req.params
+  let id = req.params.id
 
   try {
     const cacheResults = await redisClient.get(id)
@@ -146,8 +146,8 @@ const getPlayerUnlocks = asyncHandler(async (req: Request, res: Response) => {
   }
 })
 
-const createPlayer = asyncHandler(async (req: Request, res: Response) => {
-  let key = req.body.key;
+const getPlayerKey = asyncHandler(async (req: Request, res: Response) => {
+  let key = req.params.key
 
   try {
     const cacheResults = await redisClient.get(key);
@@ -157,16 +157,44 @@ const createPlayer = asyncHandler(async (req: Request, res: Response) => {
       const dataObject = fetchPlayer(data);
       res.json(dataObject);
     } else {
-      res.status(404).send('Data not found');
+      res.status(404)
+      throw new Error(`Cannot find player with KEY ${key}`)
     }
   } catch (e) {
-    console.error(e);
-    res.status(500).send('Internal server error');
+    res.status(500)
+    if (e instanceof Error) {
+      throw new Error(e.message)
+    } else {
+      throw e
+    }
+  }
+})
+
+const getPlayerMessages = asyncHandler(async (req: Request, res: Response) => {
+  let key = req.params.key
+
+  try {
+    const listData = await redisClient.lrange(key, 0, -1)
+
+    if (listData.length > 0) {
+      res.json(listData)
+    } else {
+      res.status(404)
+      throw new Error(`Cannot find player messages with KEY ${key}`)
+    }
+  } catch (e) {
+    res.status(500)
+    if (e instanceof Error) {
+      throw new Error(e.message)
+    } else {
+      throw e
+    }
   }
 })
 
 export {
-  createPlayer,
   getPlayer,
+  getPlayerKey,
+  getPlayerMessages,
   getPlayerUnlocks
 }
