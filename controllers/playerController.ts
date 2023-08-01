@@ -146,7 +146,27 @@ const getPlayerUnlocks = asyncHandler(async (req: Request, res: Response) => {
   }
 })
 
+const createPlayer = asyncHandler(async (req: Request, res: Response) => {
+  let key = req.body.key;
+
+  try {
+    const cacheResults = await redisClient.get(key);
+    if (cacheResults) {
+      const rawData = JSON.parse(cacheResults) as RawData;
+      const data = convertDataFormat(rawData);
+      const dataObject = fetchPlayer(data);
+      res.json(dataObject);
+    } else {
+      res.status(404).send('Data not found');
+    }
+  } catch (e) {
+    console.error(e);
+    res.status(500).send('Internal server error');
+  }
+})
+
 export {
+  createPlayer,
   getPlayer,
   getPlayerUnlocks
 }
