@@ -15,7 +15,7 @@ var corsOptions = {
 
 app.use(cors(corsOptions))
 app.use(bodyParser.json())
-app.use('/api/player', playerRoutes)
+app.use('/player', playerRoutes)
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Welcome to the ArmaRedis API')
